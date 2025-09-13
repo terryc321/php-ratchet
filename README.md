@@ -118,3 +118,36 @@ now lets run the chat server
 php bin/chat-server.php
 ```
 
+
+```
+terry@terry-MS-7D96:~/code/php-ratchet$ tree -I vendor
+.
+├── bin
+│   └── chat-server.php
+├── composer.json
+├── composer.lock
+├── index.html
+├── README.md
+├── src
+│   └── MyApp
+│       └── Chat.php
+└── test.php
+
+```
+
+## DIR
+
+learning/dir.php
+```
+<?php
+echo "test\n";
+echo "dirname ={" , dirname(__DIR__) , "}";
+echo "\n\n";
+```
+
+we see the output 
+```
+test
+dirname ={/home/terry/code/php-ratchet}
+```
+so we know that ```__DIR__``` gives ```/home/terry/code/php-ratchet```
