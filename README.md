@@ -341,3 +341,308 @@ class Pusher implements WampServerInterface {
     }
 }
 ```
+
+
+# editing blog submission
+
+post.php where are we putting this ? what is pdo ?
+
+```
+<?php
+    // post.php ???
+    // This all was here before  ;)
+    $entryData = array(
+        'category' => $_POST['category']
+      , 'title'    => $_POST['title']
+      , 'article'  => $_POST['article']
+      , 'when'     => time()
+    );
+
+    $pdo->prepare("INSERT INTO blogs (title, article, category, published) VALUES (?, ?, ?, ?)")
+        ->execute($entryData['title'], $entryData['article'], $entryData['category'], $entryData['when']);
+
+    // This is our new stuff
+    $context = new ZMQContext();
+    $socket = $context->getSocket(ZMQ::SOCKET_PUSH, 'my pusher');
+    $socket->connect("tcp://localhost:5555");
+
+    $socket->send(json_encode($entryData));
+```
+
+
+# handling ZeroMQ messages
+
+lets try calling this src/Pusher.php
+```
+<?php
+namespace MyApp;
+use Ratchet\ConnectionInterface;
+use Ratchet\Wamp\WampServerInterface;
+
+class Pusher implements WampServerInterface {
+    /**
+     * A lookup of all the topics clients have subscribed to
+     */
+    protected $subscribedTopics = array();
+
+    public function onSubscribe(ConnectionInterface $conn, $topic) {
+        $this->subscribedTopics[$topic->getId()] = $topic;
+    }
+
+    /**
+     * @param string JSON'ified string we'll receive from ZeroMQ
+     */
+    public function onBlogEntry($entry) {
+        $entryData = json_decode($entry, true);
+
+        // If the lookup topic object isn't set there is no one to publish to
+        if (!array_key_exists($entryData['category'], $this->subscribedTopics)) {
+            return;
+        }
+
+        $topic = $this->subscribedTopics[$entryData['category']];
+
+        // re-send the data to all the clients subscribed to that category
+        $topic->broadcast($entryData);
+    }
+
+    /* The rest of our methods were as they were, omitted from docs to save space */
+}
+```
+
+# push-server.php
+
+bin/push-server.php 
+
+```
+<?php
+    require dirname(__DIR__) . '/vendor/autoload.php';
+
+    $loop   = React\EventLoop\Factory::create();
+    $pusher = new MyApp\Pusher;
+
+    // Listen for the web server to make a ZeroMQ push after an ajax request
+    $context = new React\ZMQ\Context($loop);
+    $pull = $context->getSocket(ZMQ::SOCKET_PULL);
+    $pull->bind('tcp://127.0.0.1:5555'); // Binding to 127.0.0.1 means the only client that can connect is itself
+    $pull->on('message', array($pusher, 'onBlogEntry'));
+
+    // Set up our WebSocket server for clients wanting real-time updates
+    $webSock = new React\Socket\Server('0.0.0.0:8080', $loop); // Binding to 0.0.0.0 means remotes can connect
+    $webServer = new Ratchet\Server\IoServer(
+        new Ratchet\Http\HttpServer(
+            new Ratchet\WebSocket\WsServer(
+                new Ratchet\Wamp\WampServer(
+                    $pusher
+                )
+            )
+        ),
+        $webSock
+    );
+
+    $loop->run();
+```
+
+now lets try it out 
+
+```
+php bin/push-server.php
+```
+
+## terminator terminal colours
+
+```
+shift + right click -> Preferences -> Profiles -> Colors -> Solarized light
+```
+
+## Pusher class 
+
+```
+> php bin/push-server.php
+
+PHP Fatal error:  Class MyApp\Pusher contains 6 abstract methods and must therefore be declared abstract or implement the remaining methods (Ratchet\Wamp\WampServerInterface::onCall, Ratchet\Wamp\WampServerInterface::onUnSubscribe, Ratchet\Wamp\WampServerInterface::onPublish, ...) in /home/terry/code/php-ratchet/src/Pusher.php on line 6
+```
+
+refers to src/Pusher.php missing onCall , onUnSubscribe , onPublish 
+
+re-reading documentation again the new (src/Pusher.php) should look like this 
+
+```
+<?php
+namespace MyApp;
+use Ratchet\ConnectionInterface;
+use Ratchet\Wamp\WampServerInterface;
+
+class Pusher implements WampServerInterface {
+    /**
+     * A lookup of all the topics clients have subscribed to
+     */
+    protected $subscribedTopics = array();
+
+    public function onSubscribe(ConnectionInterface $conn, $topic) {
+        $this->subscribedTopics[$topic->getId()] = $topic;
+    }
+
+    /**
+     * @param string JSON'ified string we'll receive from ZeroMQ
+     */
+    public function onBlogEntry($entry) {
+        $entryData = json_decode($entry, true);
+
+        // If the lookup topic object isn't set there is no one to publish to
+        if (!array_key_exists($entryData['category'], $this->subscribedTopics)) {
+            return;
+        }
+
+        $topic = $this->subscribedTopics[$entryData['category']];
+
+        // re-send the data to all the clients subscribed to that category
+        $topic->broadcast($entryData);
+    }
+
+    /* The rest of our methods were as they were, omitted from docs to save space */
+    public function onUnSubscribe(ConnectionInterface $conn, $topic) {
+    }
+    public function onOpen(ConnectionInterface $conn) {
+    }
+    public function onClose(ConnectionInterface $conn) {
+    }
+    public function onCall(ConnectionInterface $conn, $id, $topic, array $params) {
+        // In this application if clients send data it's because the user hacked around in console
+        $conn->callError($id, $topic, 'You are not allowed to make calls')->close();
+    }
+    public function onPublish(ConnectionInterface $conn, $topic, $event, array $exclude, array $eligible) {
+        // In this application if clients send data it's because the user hacked around in console
+        $conn->close();
+    }
+    public function onError(ConnectionInterface $conn, \Exception $e) {
+    }
+}
+
+```
+
+lets try this again 
+
+```
+> php bin/push-server.php
+
+php /usr/local/bin/composer update
+Loading composer repositories with package information
+Updating dependencies
+Your requirements could not be resolved to an installable set of packages.
+
+  Problem 1
+    - Root composer.json requires react/zmq 0.2.*|0.3.* -> satisfiable by react/zmq[v0.2.0, v0.3.0].
+    - react/zmq[v0.2.0, ..., v0.3.0] require ext-zmq * -> it is missing from your system. Install or enable PHP's zmq extension.
+
+To enable extensions, verify that they are enabled in your .ini files:
+    - /etc/php/8.3/cli/php.ini
+    - /etc/php/8.3/cli/conf.d/10-opcache.ini
+    - /etc/php/8.3/cli/conf.d/10-pdo.ini
+    - /etc/php/8.3/cli/conf.d/20-calendar.ini
+    - /etc/php/8.3/cli/conf.d/20-ctype.ini
+    - /etc/php/8.3/cli/conf.d/20-curl.ini
+    - /etc/php/8.3/cli/conf.d/20-exif.ini
+    - /etc/php/8.3/cli/conf.d/20-ffi.ini
+    - /etc/php/8.3/cli/conf.d/20-fileinfo.ini
+    - /etc/php/8.3/cli/conf.d/20-ftp.ini
+    - /etc/php/8.3/cli/conf.d/20-gettext.ini
+    - /etc/php/8.3/cli/conf.d/20-iconv.ini
+    - /etc/php/8.3/cli/conf.d/20-phar.ini
+    - /etc/php/8.3/cli/conf.d/20-posix.ini
+    - /etc/php/8.3/cli/conf.d/20-readline.ini
+    - /etc/php/8.3/cli/conf.d/20-shmop.ini
+    - /etc/php/8.3/cli/conf.d/20-sockets.ini
+    - /etc/php/8.3/cli/conf.d/20-sysvmsg.ini
+    - /etc/php/8.3/cli/conf.d/20-sysvsem.ini
+    - /etc/php/8.3/cli/conf.d/20-sysvshm.ini
+    - /etc/php/8.3/cli/conf.d/20-tokenizer.ini
+You can also run `php --ini` in a terminal to see which files are used by PHP in CLI mode.
+Alternatively, you can run Composer with `--ignore-platform-req=ext-zmq` to temporarily ignore these required extensions.
+```
+
+package php-zmq is missing as it is an executable , we can install it in debian using
+```
+sudo apt install php-zmq
+```
+
+we can now update the project directory
+
+```
+terry@terry-MS-7D96:~/code/php-ratchet$ php /usr/local/bin/composer update
+Loading composer repositories with package information
+Updating dependencies
+Lock file operations: 2 installs, 6 updates, 0 removals
+  - Downgrading evenement/evenement (v3.0.2 => v2.1.0)
+  - Downgrading react/dns (v1.13.0 => v1.1.0)
+  - Downgrading react/event-loop (v1.5.0 => v0.4.3)
+  - Downgrading react/promise (v3.3.0 => v2.11.0)
+  - Locking react/promise-timer (v1.6.0)
+  - Downgrading react/socket (v1.16.0 => v1.3.0)
+  - Downgrading react/stream (v1.4.0 => v1.1.1)
+  - Locking react/zmq (v0.3.0)
+Writing lock file
+Installing dependencies from lock file (including require-dev)
+Package operations: 2 installs, 6 updates, 0 removals
+  - Downloading react/event-loop (v0.4.3)
+  - Downloading evenement/evenement (v2.1.0)
+  - Downloading react/stream (v1.1.1)
+  - Downloading react/promise (v2.11.0)
+  - Downloading react/promise-timer (v1.6.0)
+  - Downloading react/dns (v1.1.0)
+  - Downloading react/socket (v1.3.0)
+  - Downloading react/zmq (v0.3.0)
+ 0/8 [>---------------------------]   0% 6/8 [=====================>------]  75% 8/8 [============================] 100%  - Downgrading react/event-loop (v1.5.0 => v0.4.3): Extracting archive
+  - Downgrading evenement/evenement (v3.0.2 => v2.1.0): Extracting archive
+  - Downgrading react/stream (v1.4.0 => v1.1.1): Extracting archive
+  - Downgrading react/promise (v3.3.0 => v2.11.0): Extracting archive
+  - Installing react/promise-timer (v1.6.0): Extracting archive
+  - Downgrading react/dns (v1.13.0 => v1.1.0): Extracting archive
+  - Downgrading react/socket (v1.16.0 => v1.3.0): Extracting archive
+  - Installing react/zmq (v0.3.0): Extracting archive
+ 0/8 [>---------------------------]   0% 8/8 [============================] 100%Generating autoload files
+8 packages you are using are looking for funding.
+Use the `composer fund` command to find out more!
+No security vulnerability advisories found.
+terry@terry-MS-7D96:~/code/php-ratchet$ 
+```
+
+looks like it did something.
+
+lets try again ..
+
+```
+> php bin/push-server.php
+```
+so this seems to be waiting for input 
+
+# javascript html file
+
+src/kittens.html 
+
+```
+<script src="https://gist.githubusercontent.com/cboden/fcae978cfc016d506639c5241f94e772/raw/e974ce895df527c83b8e010124a034cfcf6c9f4b/autobahn.js"></script>
+<script>
+    /* ab.Session undefined 
+    var conn = new ab.Session('ws://localhost:8080',
+	 */
+	 var conn = new autobahn.Session('ws://localhost:8080',
+        function() {
+            conn.subscribe('kittensCategory', function(topic, data) {
+                // This is where you would add the new article to the DOM (beyond the scope of this tutorial)
+                console.log('New article published to category "' + topic + '" : ' + data.title);
+            });
+        },
+        function() {
+            console.warn('WebSocket connection closed');
+        },
+        {'skipSubprotocolCheck': true}
+    );
+</script>
+```
+
+
+
+
+
+
