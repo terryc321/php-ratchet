@@ -72,7 +72,7 @@ We're going to hold everything in the MyApp namespace. Your composer file [compo
 
 
 
-Now lets create src/MyApp/Chat.php file 
+Now lets create src/Chat.php file 
 ```
 <?php
 namespace MyApp;
@@ -120,7 +120,7 @@ php bin/chat-server.php
 
 
 ```
-terry@terry-MS-7D96:~/code/php-ratchet$ tree -I vendor
+terry@terry-MS-7D96:~/code/php-ratchet$ tree -I vendor -I learning
 .
 ├── bin
 │   └── chat-server.php
@@ -128,11 +128,8 @@ terry@terry-MS-7D96:~/code/php-ratchet$ tree -I vendor
 ├── composer.lock
 ├── index.html
 ├── README.md
-├── src
-│   └── MyApp
-│       └── Chat.php
-└── test.php
-
+└── src
+    └── Chat.php
 ```
 
 ## DIR
