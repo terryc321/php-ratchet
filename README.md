@@ -45,7 +45,7 @@ PROJECT='php-ratchet'
 mkdir -pv ~/code/$PROJECT
 cd ~/code/$PROJECT
 
-echo "# symmetrical-potato" >> README.md
+echo "# $PROJECT" >> README.md
 git init
 git add README.md
 git commit -m "first commit"
