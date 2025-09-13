@@ -151,3 +151,19 @@ test
 dirname ={/home/terry/code/php-ratchet}
 ```
 so we know that ```__DIR__``` gives ```/home/terry/code/php-ratchet```
+
+# composer
+
+```
+composer dump-autoload
+```
+
+# chat server errors 
+```
+> php bin/chat-server.php
+PHP Fatal error:  Uncaught Error: Class "MyApp\Chat" not found in /home/terry/code/php-ratchet/bin/chat-server.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/terry/code/php-ratchet/bin/chat-server.php on line 8
+```
+
