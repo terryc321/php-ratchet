@@ -72,7 +72,7 @@ We're going to hold everything in the MyApp namespace. Your composer file [compo
 
 
 
-Now lets create src/Chat.php file 
+Now lets create src/MyApp/Chat.php file 
 ```
 <?php
 namespace MyApp;
@@ -99,7 +99,7 @@ next create [bin/chat-server.php] file
 ```
 <?php
 use Ratchet\Server\IoServer;
-use MyApp\Chat;
+use MyApp/Chat;
 
     require dirname(__DIR__) . '/vendor/autoload.php';
 
@@ -112,4 +112,9 @@ use MyApp\Chat;
 ```
 
 note there is no closing brace on [bin/chat-server.php] file
+
+now lets run the chat server
+```
+php bin/chat-server.php
+```
 
