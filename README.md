@@ -903,7 +903,41 @@ Empty set (0.00 sec)
 
 what tables need for authentication login ?
 
+# PHP Login 
 
+[https://codeshack.io/secure-login-system-php-mysql/#authenticatinguserswithphp]
+
+
+```
+cd phplogin
+sudo php -S 127.0.0.1:80 -t .
+```
+
+on successful login - index.php will redirect to home.php 
+
+will keep doing so until user logs out
+
+# Additional Security Tips and Resources
+
+```
+
+shamelessly pulled from 
+https://codeshack.io/secure-login-system-php-mysql/#authenticatinguserswithphp
+
+Additional Tips and Resources
+Further increase security with our tips and resources below.
+
+Always use the htmlspecialchars() function to escape user input.
+Place the connection details inside a single file that's outside of the webroot directory to further increase security.
+Secure Session INI Settings: https://www.php.net/manual/en/session.security.ini.php
+Never use XAMPP for production purposes because it's not designed for such.
+Always use HTTPS and have a dedicated SSL certificate.
+Use PHP's error_reporting(0) in production to suppress error messages and log errors to a file or database for review by developers.
+Add CSRF tokens to your forms to prevent cross-site request forgery attacks.
+Always use prepared statements to prevent SQL injection attacks.
+Use password_hash() and password_verify() to hash passwords.
+Use session_regenerate_id() to prevent session fixation attacks.
+```
 
 
 
