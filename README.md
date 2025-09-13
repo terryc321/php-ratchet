@@ -152,13 +152,13 @@ dirname ={/home/terry/code/php-ratchet}
 ```
 so we know that ```__DIR__``` gives ```/home/terry/code/php-ratchet```
 
-# composer
+## composer
 
 ```
 composer dump-autoload
 ```
 
-# chat server errors 
+## chat server errors 
 ```
 > php bin/chat-server.php
 PHP Fatal error:  Uncaught Error: Class "MyApp\Chat" not found in /home/terry/code/php-ratchet/bin/chat-server.php:8
@@ -166,4 +166,27 @@ Stack trace:
 #0 {main}
   thrown in /home/terry/code/php-ratchet/bin/chat-server.php on line 8
 ```
+
+## php curl extension
+
+```
+sudo apt install php-curl
+```
+
+## php composer update
+
+```
+> php /usr/local/bin/composer update
+Loading composer repositories with package information
+Updating dependencies
+Nothing to modify in lock file
+Writing lock file
+Installing dependencies from lock file (including require-dev)
+Nothing to install, update or remove
+Generating autoload files
+12 packages you are using are looking for funding.
+Use the `composer fund` command to find out more!
+No security vulnerability advisories found.
+```
+
 
