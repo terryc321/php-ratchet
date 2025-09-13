@@ -807,9 +807,106 @@ ALTER USER 'root'@'localhost' IDENTIFIED BY 'MyNewPass';
 mysqld --init-file=set-root.txt
 ```
 
+# on debian 
+
 restart the mysql server
 ```
-sudo service mysql start
+service mysql start
 ```
+
+we can gain access using a defaults-file
+
+```
+sudo mysql --defaults-file=/etc/mysql/debian.cnf
+```
+
+
+now for some mysql magic
+```
+mysql> use mysql;
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+> select User , Host , plugin from mysql.user ;
++------------------+-----------+-----------------------+
+| User             | Host      | plugin                |
++------------------+-----------+-----------------------+
+| debian-sys-maint | localhost | caching_sha2_password |
+| mysql.infoschema | localhost | caching_sha2_password |
+| mysql.session    | localhost | caching_sha2_password |
+| mysql.sys        | localhost | caching_sha2_password |
+| root             | localhost | auth_socket           |
++------------------+-----------+-----------------------+
+5 rows in set (0.00 sec)
+
+```
+
+```
+> sudo mysql -uroot 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 16
+Server version: 8.0.43-0ubuntu0.24.04.1 (Ubuntu)
+
+Copyright (c) 2000, 2025, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+```
+
+so we need to create a new user with password
+
+```
+> CREATE USER 'user'@'localhost';
+> CREATE DATABASE myDB;
+```
+
+set user password to secret
+```
+>ALTER USER 'user'@'localhost' IDENTIFIED BY 'secret';
+Query OK, 0 rows affected (0.01 sec)
+
+> FLUSH PRIVILEGES;
+Query OK, 0 rows affected (0.00 sec)
+
+```
+
+# Mysql usage
+
+ok so we have a user and password to access mysql 
+
+```
+mysql -uuser -p
+Enter password: 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 17
+Server version: 8.0.43-0ubuntu0.24.04.1 (Ubuntu)
+
+Copyright (c) 2000, 2025, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> use myDB;
+Database changed
+mysql> show tables;
+Empty set (0.00 sec)
+```
+
+# Mysql login 
+
+what tables need for authentication login ?
+
+
+
+
+
+
 
 
