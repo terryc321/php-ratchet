@@ -8,8 +8,13 @@
       , 'when'     => time()
     );
 
+/*
+ ... we are not using a database just yet ...
+
     $pdo->prepare("INSERT INTO blogs (title, article, category, published) VALUES (?, ?, ?, ?)")
         ->execute($entryData['title'], $entryData['article'], $entryData['category'], $entryData['when']);
+*/
+
 
     // This is our new stuff
     $context = new ZMQContext();

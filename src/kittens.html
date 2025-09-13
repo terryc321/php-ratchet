@@ -1,8 +1,13 @@
 
-<script src="https://gist.githubusercontent.com/cboden/fcae978cfc016d506639c5241f94e772/raw/e974ce895df527c83b8e010124a034cfcf6c9f4b/autobahn.js"></script>
+<!--
+    <script src="https://gist.githubusercontent.com/cboden/fcae978cfc016d506639c5241f94e772/raw/e974ce895df527c83b8e010124a034cfcf6c9f4b/autobahn.js"></script>
+    autobahn.js may not load in time ,
+    ab will be undefined when call to ab.Session to begin    
+-->
+<script src="./autobahn.js"></script>
+
 <script>
-  /* was ab.Session */
-    var conn = new autobahn.Session('ws://localhost:8080',
+    var conn = new ab.Session('ws://localhost:8080',
         function() {
             conn.subscribe('kittensCategory', function(topic, data) {
                 // This is where you would add the new article to the DOM (beyond the scope of this tutorial)
