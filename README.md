@@ -905,6 +905,8 @@ what tables need for authentication login ?
 
 # PHP Login 
 
+phplogin directory handles most expect in a login system
+
 [https://codeshack.io/secure-login-system-php-mysql/#authenticatinguserswithphp]
 
 
@@ -947,6 +949,24 @@ maybe need more than one web browser
 
 perhaps firefox for user1 , chrome for user2 to see interaction of websockets
 
+this seems to work for two users.
+
+camera1 , camera2 , camera3 movement detected 
+
+speaker1 speaker2 speaker3 activate deactivate 
+
+# how do we incorporate what learned with phplogin with websockets
+
+
+# music venue 
+
+make way to seating the performance will begin soon
+
+make way to safely to the exit
+
+# can we send a broadcast message to specific targets 
+
+# can we send broadcast message to everyone 
 
 
 
