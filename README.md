@@ -741,5 +741,75 @@ New article published to category "kittensCategory" : a simple title22222
 # success on push integration stage ratchet php zeromq
 
 
+# PHP Login 
+
+cookies are on users computer can be compromised easily
+
+using session stored on server may be little more secure
+
+create initial database myDB 
+
+```
+<?php
+$servername = "localhost";
+$username = "username";
+$password = "password";
+
+// Create connection - this is a mysql database then 
+$conn = new mysqli($servername, $username, $password);
+// Check connection
+if ($conn->connect_error) {
+  die("Connection failed: " . $conn->connect_error);
+}
+
+// Create database myDB
+$sql = "CREATE DATABASE myDB";
+if ($conn->query($sql) === TRUE) {
+  echo "Database created successfully";
+} else {
+  echo "Error creating database: " . $conn->error;
+}
+
+$conn->close();
+?>
+
+```
+
+# install MySQL executables
+
+```
+sudo apt install php-mysql
+sudo apt install mysql-client mysql-server
+```
+
+## start mysql client
+
+```
+> mysql
+ERROR 1045 (28000): Access denied for user 'terry'@'localhost' (using password: NO)
+```
+
+stop the mysql server
+```
+> service mysql status
+> service mysql stop
+... enter root password linux ...
+```
+
+make a text file 
+
+set-root.txt
+```
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'MyNewPass';
+```
+
+```
+mysqld --init-file=set-root.txt
+```
+
+restart the mysql server
+```
+sudo service mysql start
+```
 
 
