@@ -616,7 +616,7 @@ lets try again ..
 ```
 so this seems to be waiting for input 
 
-# javascript html file
+# javascript kittens html file
 
 src/kittens.html 
 
@@ -641,7 +641,104 @@ src/kittens.html
 </script>
 ```
 
+# curl POST requests
 
+we can pass json data to make a post request
+
+```
+curl --json '{"name": "Jonn"}' --json '{"age": "36"}'  http://example.com/api/
+```
+
+
+```
+curl --json '{"category": "Books"}' --json '{"title": "Robinson crusoe"}' --json '{"article": "Many a times..."}' http://localhost:8080/src/post.php 
+```
+
+# test post using php
+
+```
+<?php
+    // post.php ???
+    // This all was here before  ;)
+    $entryData = array(
+        'category' => 'the category goes here'
+      , 'title'    => 'the title goes here'
+      , 'article'  => 'this is my article contents'
+      , 'when'     => time()
+    );
+
+    /*  not using a database just yet so we can comment out this code 	
+	$pdo->prepare("INSERT INTO blogs (title, article, category, published) VALUES (?, ?, ?, ?)")
+        ->execute($entryData['title'], $entryData['article'], $entryData['category'], $entryData['when']);
+    */
+
+    // This is our new stuff
+    $context = new ZMQContext();
+    $socket = $context->getSocket(ZMQ::SOCKET_PUSH, 'my pusher');
+    $socket->connect("tcp://localhost:5555");
+
+    $socket->send(json_encode($entryData));
+```
+
+# debugging , so what are we supposed to do ? 
+
+lets have a simple html submit form that will use post.php 
+
+src/simple-form.html
+```
+<!DOCTYPE HTML>
+<html>  
+<body>
+
+<form action="post.php" method="post">
+<!-- want a hidden category => 'kittensCategory' -->
+<input type="hidden" id="category" name="category" value="kittensCategory" />
+Title: <input type="text" name="title"><br>
+Article: <input type="text" name="article"><br>
+<!-- also published field (the time of post) but that filled in by post.php -->
+<input type="submit">
+</form>
+
+</body>
+</html>
+
+```
+
+lets start the php push server
+```
+php bin/push-server.php
+```
+
+lets start a php web server in directory of src 
+starts localhost port 80 default for http traffic with document root . in current directory 
+which will be the src directory
+```
+cd src
+sudo php -S 127.0.0.1:80 -t .
+```
+
+open a web browser at 
+```
+localhost/kittens.html
+```
+and open javascript console
+
+
+open a second web browser tab at 
+```
+localhost/simple-form.html
+```
+this will run html code at src/simple-form.html
+
+fill in the title and article values should initiate a post request to (post.php)
+
+if we now look back at kittens.html page we should see in console 
+
+```
+New article published to category "kittensCategory" : a simple title22222
+```
+
+# success on push integration stage ratchet php zeromq
 
 
 
