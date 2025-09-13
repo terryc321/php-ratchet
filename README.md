@@ -55,4 +55,19 @@ git push -u origin main
 ```
 
 
+We're going to hold everything in the MyApp namespace. Your composer file [composer.json] should look something like this:
+
+```
+{
+    "autoload": {
+        "psr-4": {
+            "MyApp\\": "src"
+        }
+    },
+    "require": {
+        "cboden/ratchet": "^0.4"
+    }
+}
+```
+
 
