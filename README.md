@@ -71,3 +71,45 @@ We're going to hold everything in the MyApp namespace. Your composer file [compo
 ```
 
 
+
+Now lets create src/Chat.php file 
+```
+<?php
+namespace MyApp;
+use Ratchet\MessageComponentInterface;
+use Ratchet\ConnectionInterface;
+
+class Chat implements MessageComponentInterface {
+    public function onOpen(ConnectionInterface $conn) {
+    }
+
+    public function onMessage(ConnectionInterface $from, $msg) {
+    }
+
+    public function onClose(ConnectionInterface $conn) {
+    }
+
+    public function onError(ConnectionInterface $conn, \Exception $e) {
+    }
+}
+
+```
+
+next create [bin/chat-server.php] file
+```
+<?php
+use Ratchet\Server\IoServer;
+use MyApp\Chat;
+
+    require dirname(__DIR__) . '/vendor/autoload.php';
+
+    $server = IoServer::factory(
+        new Chat(),
+        8080
+    );
+
+    $server->run();
+```
+
+note there is no closing brace on [bin/chat-server.php] file
+
