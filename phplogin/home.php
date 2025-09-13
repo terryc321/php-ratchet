@@ -22,7 +22,7 @@ if (!isset($_SESSION['account_loggedin'])) {
 
             <div class="wrapper">
 
-                <h1>Website Title</h1>
+                <h1>Audibles</h1>
                 
                 <nav class="menu">
                     <a href="home.php">Home</a>

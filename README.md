@@ -939,6 +939,15 @@ Use password_hash() and password_verify() to hash passwords.
 Use session_regenerate_id() to prevent session fixation attacks.
 ```
 
+# drawbacks php session_id
+
+if logout , all tabs windows log out
+
+maybe need more than one web browser 
+
+perhaps firefox for user1 , chrome for user2 to see interaction of websockets
+
+
 
 
 

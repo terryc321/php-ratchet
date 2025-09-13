@@ -8,9 +8,9 @@ if (!isset($_SESSION['account_loggedin'])) {
 }
 // Change the below variables to reflect your MySQL database details
 $DATABASE_HOST = 'localhost';
-$DATABASE_USER = 'root';
-$DATABASE_PASS = '';
-$DATABASE_NAME = 'phplogin';
+$DATABASE_USER = 'user';
+$DATABASE_PASS = 'secret';
+$DATABASE_NAME = 'myDB';
 // Try and connect using the info above
 $con = mysqli_connect($DATABASE_HOST, $DATABASE_USER, $DATABASE_PASS, $DATABASE_NAME);
 // Ensure there are no connection errors
@@ -41,7 +41,7 @@ $stmt->close();
 
             <div class="wrapper">
 
-                <h1>Website Title</h1>
+                <h1>Audibles</h1>
                 
                 <nav class="menu">
                     <a href="home.php">Home</a>
@@ -90,4 +90,5 @@ $stmt->close();
 </html>
 
 
+     
      
